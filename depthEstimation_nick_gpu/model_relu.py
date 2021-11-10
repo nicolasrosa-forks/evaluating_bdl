@@ -187,4 +187,4 @@ class DepthEstimationNet(nn.Module):
         print("Total number of params: {}\n".format(self.total_num_params))
 
 # Debug
-model = DepthEstimationNet()
+# model = DepthEstimationNet()

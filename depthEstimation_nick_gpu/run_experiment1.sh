@@ -1,5 +1,5 @@
 #bin/bash!
-# python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 1
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 1
 python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 2
 python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 4
 python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 6
