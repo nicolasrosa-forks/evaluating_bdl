@@ -1,0 +1,51 @@
+#bin/bash!
+# python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 1
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 2
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 4
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 6
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 8
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 10
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 12
+python3 ensembling_train_epoch.py -M 1 -f relu -o adam -b 14
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 1
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 2
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 4
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 6
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 8
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 10
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 12
+python3 ensembling_train_epoch.py -M 1 -f relu -o adabelief -b 14
+
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 1
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 2
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 4
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 6
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 8
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 10
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 12
+python3 ensembling_train_epoch.py -M 1 -f elu -o adam -b 14
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 1
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 2
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 4
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 6
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 8
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 10
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 12
+python3 ensembling_train_epoch.py -M 1 -f elu -o adabelief -b 14
+
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 1
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 2
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 4
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 6
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 8
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 10
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 12
+python3 ensembling_train_epoch.py -M 1 -f selu -o adam -b 14
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 1
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 2
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 4
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 6
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 8
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 10
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 12
+python3 ensembling_train_epoch.py -M 1 -f selu -o adabelief -b 14
