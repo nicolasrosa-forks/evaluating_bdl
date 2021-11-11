@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 model_id = "mcdropout_virtual"
 
-snapshot_dir_base = "/root/evaluating_bdl/depthCompletion/training_logs/%s" % model_id
+snapshot_dir_base = "/workspace/evaluating_bdl/depthCompletion/training_logs/%s" % model_id
 
 virtualkitti_path = "/root/data/virtualkitti"
 

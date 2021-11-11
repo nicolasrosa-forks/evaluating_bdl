@@ -23,16 +23,16 @@ import matplotlib.pyplot as plt
 
 model_id = "mcdropout"
 
-snapshot_dir_base = "/root/evaluating_bdl/depthCompletion/training_logs/%s" % model_id
+snapshot_dir_base = "/workspace/evaluating_bdl/depthCompletion/training_logs/%s" % model_id
 
 kitti_depth_path = "/root/data/kitti_depth"
 kitti_rgb_path = "/root/data/kitti_rgb"
 
-batch_size = 4
+batch_size = 6
 weight_decay = 0.0005
 num_steps = 40000
 
-val_batch_size = 4
+val_batch_size = 6
 
 save_pred_every = 1000
 

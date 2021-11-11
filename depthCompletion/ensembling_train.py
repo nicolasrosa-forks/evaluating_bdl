@@ -23,16 +23,16 @@ import matplotlib.pyplot as plt
 
 model_id = "ensembling"
 
-snapshot_dir_base = "/root/evaluating_bdl/depthCompletion/training_logs/%s" % model_id
+snapshot_dir_base = "/workspace/evaluating_bdl/depthCompletion/training_logs/%s" % model_id
 
 kitti_depth_path = "/root/data/kitti_depth"
 kitti_rgb_path = "/root/data/kitti_rgb"
 
-batch_size = 4
+batch_size = 6
 weight_decay = 0.0005
 num_steps = 40000
 
-val_batch_size = 4
+val_batch_size = 6
 
 save_pred_every = 1000
 
@@ -82,7 +82,7 @@ for i in range(M):
 
         rmse = rmse_criterion(means, targets)
 
-        print ("%d/%d, loss: %g, RMSE: %g" % (i_iter, num_steps, loss.data.cpu().numpy(), rmse.data.cpu().numpy()))
+        print ("%d/%d, %d/%d, loss: %g, RMSE: %g" % (i, M, i_iter, num_steps, loss.data.cpu().numpy(), rmse.data.cpu().numpy()))
 
         batch_train_losses.append(loss.data.cpu().numpy())
         batch_train_rmses.append(rmse.data.cpu().numpy())
