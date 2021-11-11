@@ -49,3 +49,4 @@ training_logs/
 
 # Ignore extensions
 *.pyc
+*.pth
