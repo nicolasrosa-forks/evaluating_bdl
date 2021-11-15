@@ -1,12 +1,3 @@
-# ======== #
-#  Theory  #
-# ======== #
-# Activation functions: 
-# 1. https://mlfromscratch.com/activation-functions-explained/#/
-# 2. https://machinelearningmastery.com/choose-an-activation-function-for-deep-learning/
-# 3. SeLU and BathNorm: https://stackoverflow.com/questions/45122156/difference-between-batch-normalization-and-self-normalized-neural-network-with-s
-# 4. Tensorboard with Pytorch: https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html
-
 # =========== #
 #  Libraries  #
 # =========== #
@@ -55,9 +46,9 @@ kitti_rgb_path = "/home/lasi/Downloads/datasets/kitti/raw_data"
 M = 10  # TODO: Gustafsson used 33
 batch_size = 1
 
-selected_model = 'model_relu'
-# selected_model = 'model_elu'
-# selected_model = 'model_selu'
+selected_model = 'resnet34_relu'
+# selected_model = 'resnet34_elu'
+# selected_model = 'resnet34_selu'
 
 # selected_optimizer = 'adam'
 # learn_rate = 1e-5
@@ -171,12 +162,12 @@ def main():
         # check_gpu()
         # torch.cuda._lazy_init()
 
-        if selected_model == 'model_relu':
-            from model_relu import DepthEstimationNet  # ReLU
-        elif selected_model == 'model_elu':
-            from model_elu import DepthEstimationNet  # ELU
-        elif selected_model == 'model_selu':
-            from model_selu import DepthEstimationNet  # SELU
+        if selected_model == 'resnet34_relu':
+            from networks.resnet34_relu import DepthEstimationNet  # ReLU
+        elif selected_model == 'resnet34_elu':
+            from networks.resnet34_elu import DepthEstimationNet  # ELU
+        elif selected_model == 'resnet34_selu':
+            from networks.resnet34_selu import DepthEstimationNet  # SELU
 
         model = DepthEstimationNet(pretrained=True).cuda()  # GPU
         # model = DepthEstimationNet(pretrained=True)  # CPU
