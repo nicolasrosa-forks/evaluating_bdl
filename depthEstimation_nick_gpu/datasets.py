@@ -53,14 +53,14 @@ def print_example(example):
 # KITTI:
 ################################################################################
 class DatasetKITTIAugmentation(data.Dataset):  # TODO: Create .txt filename for avoiding online detection of the training files
-    def __init__(self, kitti_depth_path, kitti_rgb_path, max_iters=None, crop_size=(352, 352), showImages=False):
+    def __init__(self, kitti_depth_path, kitti_rgb_path, max_iters=None, crop_size=(352, 352), show_images=False):
         self.crop_h, self.crop_w = crop_size
 
         self.kitti_depth_train_path = kitti_depth_path + "/train"
         # self.kitti_rgb_train_path = kitti_rgb_path + "/train"
         self.kitti_rgb_train_path = kitti_rgb_path
 
-        self.showImages = showImages
+        self.showImages = show_images
         self.num_images = None
 
         # print(self.kitti_depth_train_path)
@@ -279,9 +279,9 @@ class DatasetKITTIAugmentation(data.Dataset):  # TODO: Create .txt filename for 
 
 
 class DatasetKITTIVal(data.Dataset):
-    def __init__(self, kitti_depth_path, showImages=False):
+    def __init__(self, kitti_depth_path, show_images=False):
         self.kitti_depth_val_path = kitti_depth_path + "/depth_selection/val_selection_cropped"
-        self.showImages = showImages
+        self.showImages = show_images
 
         img_dir = self.kitti_depth_val_path + "/image"
         sparse_dir = self.kitti_depth_val_path + "/velodyne_raw"
@@ -405,13 +405,13 @@ if __name__ == "__main__":
 
 
     # # Check Train Dataset
-    train_dataset = DatasetKITTIAugmentation(kitti_depth_path=kitti_depth_path, kitti_rgb_path=kitti_rgb_path, max_iters=num_steps*batch_size, crop_size=(352, 352), showImages=False)
+    train_dataset = DatasetKITTIAugmentation(kitti_depth_path=kitti_depth_path, kitti_rgb_path=kitti_rgb_path, max_iters=num_steps*batch_size, crop_size=(352, 352), show_images=False)
     print("Checking 'DatasetKITTIAugmentation' integrity...")
     for i in tqdm(range(85898)):
         train_dataset[i]
 
     # Check Evaluating Dataset
-    val_dataset = DatasetKITTIVal(kitti_depth_path=kitti_depth_path, showImages=False)
+    val_dataset = DatasetKITTIVal(kitti_depth_path=kitti_depth_path, show_images=False)
     
     print("Checking 'DatasetKITTIVal' integrity...")
     for i in tqdm(range(len(val_dataset))):

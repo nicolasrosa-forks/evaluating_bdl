@@ -31,7 +31,7 @@ class MaskedL2Gauss(nn.Module                       ):
         log_vars = log_vars[valid_mask]
 
         # Loss 
-        # Check B.2 Implementation details for the Loss Equatin
+        # Check B.2 Implementation details for the Loss Equation
         # NOTE: The following implementation doesn't consider the third term (sum of weights)
         loss = torch.mean(torch.exp(-log_vars)*torch.pow(targets - means, 2) + log_vars)
 
