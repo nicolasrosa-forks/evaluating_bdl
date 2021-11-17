@@ -29,6 +29,7 @@ from torch.utils.tensorboard import SummaryWriter
 # Custom Libraries
 from datasets import DatasetKITTIAugmentation, DatasetKITTIVal
 from criterion import MaskedL2Gauss, RMSE
+from utils.noam_opt import NoamOpt
 
 from utils.plot import showInMovedWindow
 
@@ -73,11 +74,14 @@ elif args.model_act_fn == 'selu':
     from networks.resnet34_selu import DepthEstimationNet  # SELU
 
 if args.opt == 'adam':
-    learn_rate = 1e-5
-    weight_decay = 5e-4
+    LEARN_RATE = 1e-5
+    WEIGHT_DECAY = 5e-4
 elif args.opt == 'adabelief':
-    learn_rate = 1e-3
-    weight_decay = 1e-2
+    LEARN_RATE = 1e-3
+    WEIGHT_DECAY = 1e-2
+elif args.opt == 'noam':
+    LEARN_RATE = 0
+    WEIGHT_DECAY = 5e-4
 
 # num_epochs = 20
 # num_steps = 40000
@@ -155,6 +159,12 @@ if show_images:
     showInMovedWindow('log_vars[0]', 1060, 270)
     showInMovedWindow('targets[0]', 1540, 270)
 
+def get_lr(optimizer):
+    if args.opt == 'noam':
+        optimizer = optimizer.optimizer
+
+    for param_group in optimizer.param_groups:
+        return param_group['lr']
 
 # ====== #
 #  Main  #
@@ -189,9 +199,11 @@ def main():
         model.train()
 
         if args.opt == 'adam':
-            optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate, weight_decay=weight_decay)
+            optimizer = torch.optim.Adam(model.parameters(), lr=LEARN_RATE, weight_decay=WEIGHT_DECAY)
         elif args.opt == 'adabelief':
-            optimizer = AdaBelief(model.parameters(), lr=learn_rate, betas=(0.9, 0.999), eps=1e-8, weight_decay=weight_decay, weight_decouple=True, rectify=False)
+            optimizer = AdaBelief(model.parameters(), lr=LEARN_RATE, betas=(0.9, 0.999), eps=1e-8, weight_decay=WEIGHT_DECAY, weight_decouple=True, rectify=False)
+        elif args.opt == 'noam':
+            optimizer = NoamOpt(model.total_num_params, 4000, torch.optim.Adam(model.parameters(), lr=LEARN_RATE, betas=(0.9, 0.98), eps=1e-9, weight_decay=WEIGHT_DECAY))
 
         optimizer.zero_grad()
 
@@ -203,7 +215,7 @@ def main():
         dt_string = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         current_run_dir = "./runs/{}, M{}, imgs={}, {}, opt={}, bs={}, lr={}, wd={}, {}".format(
             dt_string, m, train_dataset.getNumImages(), args.model_act_fn, args.opt,
-            batch_size, learn_rate, weight_decay, args.num_epochs)
+            batch_size, LEARN_RATE, WEIGHT_DECAY, args.num_epochs)
         
         writer = SummaryWriter(current_run_dir)
 
@@ -212,7 +224,7 @@ def main():
         # train_batch_rmses = []
 
         last_sum_val_batch_rmses = 1e9
-        
+
         # --- Training Loop --- #
         for epoch in range(args.num_epochs):
             for i_iter, batch in enumerate(train_loader):
@@ -241,10 +253,11 @@ def main():
                 # train_batch_rmses.append(rmse_cpu)
                 
                 print("%d/%d, %d/%d, %d/%d, loss: %g, RMSE: %g" % (m+1, M, epoch+1, args.num_epochs, i_iter+1, num_train_steps, loss_cpu, rmse_cpu))
-                
+
                 # Summary
                 writer.add_scalar('Train/Loss', loss_cpu, epoch*num_train_steps + i_iter)
                 writer.add_scalar('Train/RMSE', rmse_cpu, epoch*num_train_steps + i_iter)
+                writer.add_scalar('Train/LR', get_lr(optimizer), epoch*num_train_steps + i_iter)
                 writer.flush()  # Call flush() method to make sure that all pending events have been written to disk.
 
                 # Visualization
@@ -308,7 +321,7 @@ def main():
                     k = cv2.waitKey(25)
                     if k == 27:  # Esc key to stop
                         break
-            
+
             # Free GPU memory
             del imgs, targets
             torch.cuda.empty_cache()
@@ -335,7 +348,8 @@ def main():
                 sum_val_batch_losses += val_loss_cpu
                 sum_val_batch_rmses += val_rmse_cpu
 
-                print("%d/%d, %d/%d, %d/%d, loss: %g, RMSE: %g" % (m+1, M, epoch+1, args.num_epochs, k_iter+1, num_val_samples, val_loss_cpu, val_rmse_cpu))
+                # print("%d/%d, %d/%d, %d/%d, loss: %g, RMSE: %g" % (m+1, M, epoch+1, args.num_epochs, k_iter+1, num_val_samples, val_loss_cpu, val_rmse_cpu))
+                print(f"{m+1}/{M}, {epoch+1}/{args.num_epochs}, {k_iter+1}/{num_val_samples}, loss: {val_loss_cpu}, RMSE: {val_rmse_cpu}")
                 
             # Summary
             writer.add_scalar('Val/Loss', sum_val_batch_losses/num_val_samples, epoch)
