@@ -4,7 +4,6 @@
 # System Libraries
 import math
 import argparse
-from typing import Optional
 
 import cmapy
 import cv2
@@ -43,16 +42,17 @@ parser.add_argument('--opt', '-o', type=str, help='set optimizer')
 parser.add_argument('--batch_size', '-b', type=int, help='set batch_size', default=1)
 parser.add_argument('--num_epochs', '-e', type=int, help='set number of epochs', default=1)
 parser.add_argument('--restore', '-r', type=str, help='set path to restore weights', default=None)
+parser.add_argument('--show_images', '-s', action='store_true')
 args = parser.parse_args()
 
 # print(args.n_models)
 # print(args.batch_size)
+# print(args.show_images)
 # input("Press 'Enter' to continue...")
 
 # ================== #
 #  Global Variables  #
 # ================== #
-show_images = False
 debug = False
 model_id = "ensembling"
 
@@ -153,7 +153,7 @@ def checkpoints_clean_up(current_run_dir):
             send2trash(file_path)
 
 # TODO: mover
-if show_images:
+if args.show_images:
     showInMovedWindow('imgs[0]', 100, 270)
     showInMovedWindow('means[0]', 580, 270)
     showInMovedWindow('log_vars[0]', 1060, 270)
@@ -172,7 +172,7 @@ def get_lr(optimizer):
 def main():
     global np_means_0, np_log_vars_0  # Values are updated on the main() for being used on plotGaussian()
 
-    if show_images:
+    if args.show_images:
         cv2.setMouseCallback('means[0]', plotGaussian)
         cv2.setMouseCallback('log_vars[0]', plotGaussian)
 
@@ -261,7 +261,7 @@ def main():
                 writer.flush()  # Call flush() method to make sure that all pending events have been written to disk.
 
                 # Visualization
-                if show_images:
+                if args.show_images:
                     if debug:
                         np_means_0 = means[0].data.cpu().numpy()
                         np_log_vars_0 = log_vars[0].data.cpu().numpy()
