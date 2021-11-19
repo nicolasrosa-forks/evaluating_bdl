@@ -27,6 +27,90 @@ def print_image_info(image):
 mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
 
+# Excluded sequences
+person_sequences = [
+    "2011_09_28_drive_0053_sync",
+    "2011_09_28_drive_0054_sync",
+    "2011_09_28_drive_0057_sync",
+    "2011_09_28_drive_0065_sync",
+    "2011_09_28_drive_0066_sync",
+    "2011_09_28_drive_0068_sync",
+    "2011_09_28_drive_0070_sync",
+    "2011_09_28_drive_0071_sync",
+    "2011_09_28_drive_0075_sync",
+    "2011_09_28_drive_0077_sync",
+    "2011_09_28_drive_0078_sync",
+    "2011_09_28_drive_0080_sync",
+    "2011_09_28_drive_0082_sync",
+    "2011_09_28_drive_0086_sync",
+    "2011_09_28_drive_0087_sync",
+    "2011_09_28_drive_0089_sync",
+    "2011_09_28_drive_0090_sync",
+    "2011_09_28_drive_0094_sync",
+    "2011_09_28_drive_0095_sync",
+    "2011_09_28_drive_0096_sync",
+    "2011_09_28_drive_0098_sync",
+    "2011_09_28_drive_0100_sync",
+    "2011_09_28_drive_0102_sync",
+    "2011_09_28_drive_0103_sync",
+    "2011_09_28_drive_0104_sync",
+    "2011_09_28_drive_0106_sync",
+    "2011_09_28_drive_0108_sync",
+    "2011_09_28_drive_0110_sync",
+    "2011_09_28_drive_0113_sync",
+    "2011_09_28_drive_0117_sync",
+    "2011_09_28_drive_0119_sync",
+    "2011_09_28_drive_0121_sync",
+    "2011_09_28_drive_0122_sync",
+    "2011_09_28_drive_0125_sync",
+    "2011_09_28_drive_0126_sync",
+    "2011_09_28_drive_0128_sync",
+    "2011_09_28_drive_0132_sync",
+    "2011_09_28_drive_0134_sync",
+    "2011_09_28_drive_0135_sync",
+    "2011_09_28_drive_0136_sync",
+    "2011_09_28_drive_0138_sync",
+    "2011_09_28_drive_0141_sync",
+    "2011_09_28_drive_0143_sync",
+    "2011_09_28_drive_0145_sync",
+    "2011_09_28_drive_0146_sync",
+    "2011_09_28_drive_0149_sync",
+    "2011_09_28_drive_0153_sync",
+    "2011_09_28_drive_0154_sync",
+    "2011_09_28_drive_0155_sync",
+    "2011_09_28_drive_0156_sync",
+    "2011_09_28_drive_0160_sync",
+    "2011_09_28_drive_0161_sync",
+    "2011_09_28_drive_0162_sync",
+    "2011_09_28_drive_0165_sync",
+    "2011_09_28_drive_0166_sync",
+    "2011_09_28_drive_0167_sync",
+    "2011_09_28_drive_0168_sync",
+    "2011_09_28_drive_0171_sync",
+    "2011_09_28_drive_0174_sync",
+    "2011_09_28_drive_0177_sync",
+    "2011_09_28_drive_0179_sync",
+    "2011_09_28_drive_0183_sync",
+    "2011_09_28_drive_0184_sync",
+    "2011_09_28_drive_0185_sync",
+    "2011_09_28_drive_0186_sync",
+    "2011_09_28_drive_0187_sync",
+    "2011_09_28_drive_0191_sync",
+    "2011_09_28_drive_0192_sync",
+    "2011_09_28_drive_0195_sync",
+    "2011_09_28_drive_0198_sync",
+    "2011_09_28_drive_0199_sync",
+    "2011_09_28_drive_0201_sync",
+    "2011_09_28_drive_0204_sync",
+    "2011_09_28_drive_0205_sync",
+    "2011_09_28_drive_0208_sync",
+    "2011_09_28_drive_0209_sync",
+    "2011_09_28_drive_0214_sync",
+    "2011_09_28_drive_0216_sync",
+    "2011_09_28_drive_0220_sync",
+    "2011_09_28_drive_0222_sync",
+]
+
 def imagenet_normalization(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)/255.0
 
@@ -70,6 +154,10 @@ class DatasetKITTIAugmentation(data.Dataset):  # TODO: Create .txt filename for 
         # Get folders names
         train_dir_names = os.listdir(self.kitti_depth_train_path) # (contains "2011_09_26_drive_0001_sync" and so on)
 
+        # Exclude 'person' sequences
+        for seq in person_sequences:
+            train_dir_names.remove(seq)
+     
         # print(train_dir_names)
         # print(len(train_dir_names))
 
@@ -400,14 +488,14 @@ if __name__ == "__main__":
     kitti_depth_path = "/home/lasi/Downloads/datasets/kitti/depth/data_depth_annotated"
     kitti_rgb_path = "/home/lasi/Downloads/datasets/kitti/raw_data"
 
-    batch_size = 4
+    batch_size = 1
     num_steps = 40000
 
 
     # # Check Train Dataset
     train_dataset = DatasetKITTIAugmentation(kitti_depth_path=kitti_depth_path, kitti_rgb_path=kitti_rgb_path, max_iters=num_steps*batch_size, crop_size=(352, 352), show_images=False)
     print("Checking 'DatasetKITTIAugmentation' integrity...")
-    for i in tqdm(range(85898)):
+    for i in tqdm(range(len(train_dataset))):
         train_dataset[i]
 
     # Check Evaluating Dataset
