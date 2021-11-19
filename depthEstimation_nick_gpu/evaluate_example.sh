@@ -1,0 +1,1 @@
+python3 evaluate.py -m 'runs/2021-11-17_12-18-18, M0, imgs=85898, relu, opt=noam, bs=1, lr=0, wd=0.0005, 5/model_M0_epoch_2.pth' -i /home/lasi/Downloads/datasets/kitti/raw_data/2011_09_26_drive_0001_sync/image_00/data/0000000000.png
