@@ -26,8 +26,9 @@ from torch.autograd import Variable
 from torch.utils.tensorboard import SummaryWriter
 
 # Custom Libraries
-from datasets import DatasetKITTIAugmentation, DatasetKITTIVal
+from datasets import DatasetKITTIAugmentation, DatasetKITTIVal, imagenet_normalization
 from criterion import MaskedL2Gauss, RMSE
+from utils.noam_opt import NoamOpt
 
 from utils.plot import showInMovedWindow
 
@@ -39,10 +40,12 @@ parser.add_argument('--model_checkpoint_filepath', '-m', type=str, help='set des
 parser.add_argument('--model_act_fn', '-f', type=str, help='set activation function')
 # parser.add_argument('--opt', '-o', type=str, help='set optimizer')
 parser.add_argument('--batch_size', '-b', type=int, help='set batch_size', default=1)
+parser.add_argument('--input', '-i', type=str, help='set input image')
 args = parser.parse_args()
 
 # print(args.n_models)
 # print(args.batch_size)
+# print(args.show_images)
 # input("Press 'Enter' to continue...")
 
 # ================== #
@@ -155,6 +158,11 @@ def main():
         cv2.setMouseCallback('means[0]', plotGaussian)
         cv2.setMouseCallback('log_vars[0]', plotGaussian)
 
+    if args.input:
+        np_img = cv2.imread(args.input)
+        np_img = imagenet_normalization(np_img)
+        np_img = cv2.resize(np_img,(352, 352), interpolation=cv2.INTER_AREA)
+
     # Load Train Dataset
     train_dataset = DatasetKITTIAugmentation(kitti_depth_path=kitti_depth_path, kitti_rgb_path=kitti_rgb_path, crop_size=(352, 352))
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
@@ -168,6 +176,7 @@ def main():
     # --- Models Loop --- #
     # Network Architecture
     model = DepthEstimationNet().cuda()
+    # model = DepthEstimationNet() # TODO: voltar pra gpu
 
     model.print_total_num_params()
     # model = torch.nn.DataParallel(model)
@@ -197,6 +206,85 @@ def main():
     # train_batch_losses = []
     # train_batch_rmses = []
     # last_sum_val_batch_losses = 1e9
+
+    # Single Image evaluation
+    if args.input:
+        imgs = torch.from_numpy(np_img).cuda()
+        # imgs = torch.from_numpy(np_img)  # TODO: voltar pra gpu
+
+        print(imgs.shape)
+        imgs = torch.unsqueeze(imgs, dim=0)
+        
+        print(imgs.shape)
+        
+        means, log_vars = model(imgs)  # (both will have shape: (batch_size, 1, h, w))
+        # targets = torch.from_numpy(np.zeros(means[0].shape)).cuda()  # TODO: remover?
+        # targets = torch.unsqueeze(targets, dim=0)
+        
+        # Visualization
+        if show_images:
+            if debug:
+                np_means_0 = means[0].data.cpu().numpy()
+                np_log_vars_0 = log_vars[0].data.cpu().numpy()
+                # np_targets_0 = targets[0].data.cpu().numpy()
+
+                # Tensors content (meters)
+                print_image_info(np_means_0)
+                print_image_info(np_log_vars_0)
+                # print_image_info(np_targets_0)
+                print()
+
+            # Postprocesses tensors (GPU)
+            means_uint8 = torch_postprocessing_depth(means, 0.0, 80.0)
+            log_vars_uint8 = torch_postprocessing_variance(log_vars)
+            # targets_uint8 = torch_postprocessing_depth(targets, 0.0, 80.0)
+
+            # Invert colors on GPU
+            # mask = targets[0] < 0.5
+
+            means_uint8_inv_0 = 255 - means_uint8[0]
+            # targets_uint8_inv_0 = 255 - targets_uint8[0]
+            # targets_uint8_inv_0[mask] = 0
+
+            # Train Visualization
+            np_imgs_0 = imgs[0].data.cpu().numpy()
+            # np_means_uint8_0 = means_uint8[0].data.cpu().numpy()
+            np_means_uint8_inv_0 = means_uint8_inv_0.data.cpu().numpy()
+
+            np_log_vars_uint8_0 = log_vars_uint8[0].data.cpu().numpy()
+            # np_targets_uint8_0 = targets_uint8[0].data.cpu().numpy()
+            # np_targets_uint8_inv_0 = targets_uint8_inv_0.data.cpu().numpy()
+
+            # Tensors content (uint8)
+            # print_image_info(np_means_uint8_0)
+            # print_image_info(np_log_vars_uint8_0)
+            # print_image_info(np_targets_uint8_0)
+            # print()
+
+            # Colors Maps
+            # np_means_inv_0_cmap = cv2.applyColorMap(np_means_inv_0[0, :, :].astype(np.uint8), cmapy.cmap('plasma'))
+            np_means_uint8_inv_0_cmap = cv2.applyColorMap(np_means_uint8_inv_0[0, :, :].astype(np.uint8),
+                                                        cmapy.cmap('viridis'))
+            np_log_vars_uint8_0_cmap = cv2.applyColorMap(np_log_vars_uint8_0[0, :, :].astype(np.uint8),
+                                                        cv2.COLORMAP_HOT)
+            # np_targets_inv_0_cmap = cv2.applyColorMap(np_targets_inv_0.astype(np.uint8), cmapy.cmap('plasma'))
+            # np_targets_inv_0_cmap = cv2.applyColorMap(np_targets_uint8_inv_0.astype(np.uint8),
+                                                    # cmapy.cmap('viridis'))
+
+            cv2.imshow('imgs[0]', np_imgs_0)  # (shape: (h, w, 3))
+            # cv2.imshow('means[0]', np_means_0[0, :, :].astype(np.uint8))        # (shape: (1, h, w))
+            cv2.imshow('means[0]', np_means_uint8_inv_0_cmap)  # (shape: (1, h, w))
+            cv2.imshow('log_vars[0]', np_log_vars_uint8_0_cmap)  # (shape: (1, h, w))
+            # cv2.imshow('targets[0]', np_targets_0.astype(np.uint8))             # (shape: (h, w))
+            # cv2.imshow('targets[0]', np_targets_inv_0_cmap)  # (shape: (h, w))
+
+            # Press 'ESC' on keyboard to exit.
+            k = cv2.waitKey(0)
+            # if k == 27:  # Esc key to stop
+                # break
+        
+        return 0
+
 
     # --- Training Loop --- #
     for i_iter, batch in enumerate(train_loader):
