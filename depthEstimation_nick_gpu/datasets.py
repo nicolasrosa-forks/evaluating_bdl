@@ -28,6 +28,19 @@ mean = [0.485, 0.456, 0.406]
 std = [0.229, 0.224, 0.225]
 
 # Excluded sequences
+campus_sequences = [
+    "2011_09_28_drive_0016_sync",
+    "2011_09_28_drive_0021_sync",
+    "2011_09_28_drive_0034_sync",
+    "2011_09_28_drive_0035_sync",
+    "2011_09_28_drive_0037_sync",
+    "2011_09_28_drive_0038_sync",
+    "2011_09_28_drive_0039_sync",
+    "2011_09_28_drive_0043_sync",
+    "2011_09_28_drive_0045_sync",
+    "2011_09_28_drive_0047_sync",
+]
+
 person_sequences = [
     "2011_09_28_drive_0053_sync",
     "2011_09_28_drive_0054_sync",
@@ -154,9 +167,19 @@ class DatasetKITTIAugmentation(data.Dataset):  # TODO: Create .txt filename for 
         # Get folders names
         train_dir_names = os.listdir(self.kitti_depth_train_path) # (contains "2011_09_26_drive_0001_sync" and so on)
 
+        # Exclude 'cammpus' sequences
+        for seq in campus_sequences:
+            try:
+                train_dir_names.remove(seq)
+            except ValueError:
+                print(seq)
+
         # Exclude 'person' sequences
         for seq in person_sequences:
-            train_dir_names.remove(seq)
+            try:
+                train_dir_names.remove(seq)
+            except ValueError:
+                print(seq)
      
         # print(train_dir_names)
         # print(len(train_dir_names))
@@ -491,16 +514,15 @@ if __name__ == "__main__":
     batch_size = 1
     num_steps = 40000
 
-
-    # # Check Train Dataset
     train_dataset = DatasetKITTIAugmentation(kitti_depth_path=kitti_depth_path, kitti_rgb_path=kitti_rgb_path, max_iters=num_steps*batch_size, crop_size=(352, 352), show_images=False)
+    val_dataset = DatasetKITTIVal(kitti_depth_path=kitti_depth_path, show_images=False)
+
+    # Check Train Dataset
     print("Checking 'DatasetKITTIAugmentation' integrity...")
     for i in tqdm(range(len(train_dataset))):
         train_dataset[i]
 
     # Check Evaluating Dataset
-    val_dataset = DatasetKITTIVal(kitti_depth_path=kitti_depth_path, show_images=False)
-    
     print("Checking 'DatasetKITTIVal' integrity...")
     for i in tqdm(range(len(val_dataset))):
         val_dataset[i]
