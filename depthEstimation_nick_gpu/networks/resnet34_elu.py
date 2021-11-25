@@ -100,7 +100,6 @@ class DepthEstimationNet(nn.Module):
         
         self.conv1_1 = conv_bn_elu(32, 64, kernel_size=3, stride=1, padding=1)
         
-
         pretrained_model = resnet.__dict__['resnet{}'.format(self.layers)](pretrained=self.pretrained)
         if not self.pretrained:
             pretrained_model.apply(init_weights)
